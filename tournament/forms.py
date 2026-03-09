@@ -1,7 +1,7 @@
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Field, Submit, Div, HTML
-from .models import Registration, SponsorshipPackage
+from .models import Registration, SponsorshipPackage, RaffleDonation
 
 
 class RegistrationForm(forms.ModelForm):
@@ -114,3 +114,51 @@ class RegistrationForm(forms.ModelForm):
                 "Please complete the credit card information before submitting."
             )
         return cleaned_data
+
+
+class RaffleDonationForm(forms.ModelForm):
+    class Meta:
+        model = RaffleDonation
+        fields = [
+            'first_name', 'last_name', 'email', 'phone', 'company_name',
+            'donation_description', 'estimated_value', 'delivery_method',
+        ]
+        widgets = {
+            'donation_description': forms.Textarea(attrs={'rows': 4}),
+            'phone': forms.TextInput(attrs={'placeholder': '(559) 555-1234'}),
+            'estimated_value': forms.NumberInput(attrs={'placeholder': '0.00', 'min': '0', 'step': '0.01'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['first_name'].widget.attrs.update({'autofocus': 'autofocus'})
+        self.fields['phone'].required = False
+        self.fields['company_name'].required = False
+        self.fields['estimated_value'].required = False
+
+        self.helper = FormHelper()
+        self.helper.form_id = 'raffle-donation-form'
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            Row(
+                Column('first_name', css_class='col-md-6'),
+                Column('last_name', css_class='col-md-6'),
+            ),
+            Row(
+                Column('email', css_class='col-md-6'),
+                Column('phone', css_class='col-md-6'),
+            ),
+            Field('company_name'),
+            Field('donation_description'),
+            Row(
+                Column('estimated_value', css_class='col-md-6'),
+            ),
+            Field('delivery_method'),
+            HTML('''
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-gold btn-lg px-5">
+                        Submit Donation Offer
+                    </button>
+                </div>
+            '''),
+        )

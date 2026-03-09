@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.urls import path
 from django.utils.html import format_html
 
-from .models import SponsorshipPackage, Sponsor, Registration, RegistrationPlayer, TournamentInfo, AddOn, RegistrationAddOn
+from .models import SponsorshipPackage, Sponsor, Registration, RegistrationPlayer, TournamentInfo, AddOn, RegistrationAddOn, RaffleDonation
 
 
 @admin.register(TournamentInfo)
@@ -91,12 +91,14 @@ class RegistrationAdmin(admin.ModelAdmin):
 
     list_display = [
         'full_name', 'email', 'sponsorship_package', 'payment_method',
-        'payment_status', 'order_total', 'has_logo', 'created_at'
+        'payment_status', 'order_total', 'has_logo', 'logo_approved', 'created_at'
     ]
-    list_filter = ['payment_method', 'payment_status', 'sponsorship_package', 'created_at']
+    list_editable = ['logo_approved']
+    list_filter = ['payment_method', 'payment_status', 'sponsorship_package', 'logo_approved', 'created_at']
     search_fields = ['first_name', 'last_name', 'email', 'company_org', 'square_payment_id']
     readonly_fields = ['created_at', 'square_payment_id', 'logo_preview']
     date_hierarchy = 'created_at'
+    actions = ['approve_logos', 'revoke_logo_approval']
 
     inlines = [RegistrationPlayerInline, RegistrationAddOnInline]
     fieldsets = (
@@ -110,12 +112,22 @@ class RegistrationAdmin(admin.ModelAdmin):
             'fields': ('payment_method', 'payment_status', 'square_payment_id'),
         }),
         ('Logo', {
-            'fields': ('company_logo', 'logo_preview'),
+            'fields': ('company_logo', 'logo_preview', 'logo_approved'),
         }),
         ('Additional', {
             'fields': ('notes', 'created_at'),
         }),
     )
+
+    @admin.action(description="Approve selected logos for display on the home page")
+    def approve_logos(self, request, queryset):
+        updated = queryset.filter(company_logo__isnull=False).exclude(company_logo='').update(logo_approved=True)
+        self.message_user(request, f"{updated} logo(s) approved.")
+
+    @admin.action(description="Revoke logo approval (hide from home page)")
+    def revoke_logo_approval(self, request, queryset):
+        updated = queryset.update(logo_approved=False)
+        self.message_user(request, f"{updated} logo approval(s) revoked.")
 
     def get_urls(self):
         urls = super().get_urls()
@@ -235,7 +247,11 @@ class RegistrationAdmin(admin.ModelAdmin):
     order_total.short_description = "Order Total"
 
     def has_logo(self, obj):
-        return bool(obj.company_logo)
+        if not obj.company_logo:
+            return None  # renders as dash
+        if obj.logo_approved:
+            return True   # green checkmark
+        return False      # red X = uploaded but pending approval
     has_logo.short_description = "Logo"
     has_logo.boolean = True
 
@@ -247,3 +263,26 @@ class RegistrationAdmin(admin.ModelAdmin):
             )
         return "No logo uploaded"
     logo_preview.short_description = "Logo Preview"
+
+
+@admin.register(RaffleDonation)
+class RaffleDonationAdmin(admin.ModelAdmin):
+    list_display = ['full_name', 'email', 'phone', 'company_name', 'estimated_value', 'delivery_method', 'created_at']
+    search_fields = ['first_name', 'last_name', 'email', 'company_name']
+    list_filter = ['delivery_method']
+    readonly_fields = ['created_at']
+    ordering = ['-created_at']
+
+    fieldsets = (
+        ('Donor Information', {
+            'fields': ('first_name', 'last_name', 'email', 'phone', 'company_name'),
+        }),
+        ('Donation', {
+            'fields': ('donation_description', 'estimated_value', 'delivery_method', 'created_at'),
+        }),
+    )
+
+    def full_name(self, obj):
+        return obj.full_name
+    full_name.short_description = "Name"
+    full_name.admin_order_field = 'last_name'

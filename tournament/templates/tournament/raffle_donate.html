@@ -1,0 +1,68 @@
+{% extends 'tournament/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Donate a Raffle Item - Clay Elementary School Golf Tournament{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header py-5">
+    <div class="container text-center">
+        <div class="mb-3">
+            <span class="badge bg-gold text-dark px-3 py-2 fs-6 fw-semibold">
+                <i class="bi bi-gift-fill me-1"></i> Raffle Item Donation
+            </span>
+        </div>
+        <h1 class="fw-bold text-white mb-2">Donate a Raffle Item</h1>
+        <p class="text-white-75 fs-5 mb-0">Help make the tournament raffle a success for Clay Elementary School.</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+
+            <!-- Intro blurb -->
+            <div class="card border-0 bg-light mb-4">
+                <div class="card-body p-4">
+                    <p class="mb-0 text-muted fs-5 lh-lg">
+                        The Clay Golf Tournament has a long standing tradition of providing a wide variety of
+                        items for our raffle before the players take the green. Fill out the form below and our
+                        team will be in touch to coordinate pickup or drop-off of your donated item.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Donation Form -->
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-forest-green text-white py-3 px-4 rounded-top-3">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-person-fill me-2 text-gold"></i>Your Information
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    {% crispy form %}
+                </div>
+            </div>
+
+            <!-- Tax notice -->
+            <div class="alert alert-light border small text-muted mt-4 d-flex align-items-start gap-2">
+                <i class="bi bi-patch-check-fill text-forest-green flex-shrink-0 mt-1"></i>
+                <span>
+                    Clay Elementary Parent Club is a <strong>501(c)(3) nonprofit organization</strong> (EIN: 46-2668474).
+                    Donations may be tax deductible as provided by law. Please consult your tax advisor.
+                </span>
+            </div>
+
+            <!-- Back link -->
+            <div class="text-center mt-3">
+                <a href="{% url 'tournament:index' %}" class="btn btn-outline-forest px-4">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Home
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

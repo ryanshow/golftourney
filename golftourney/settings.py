@@ -106,6 +106,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
+# Email settings
+# In production, set EMAIL_HOST (and related vars) to enable SMTP delivery.
+# Without EMAIL_HOST, emails are printed to the console (development fallback).
+EMAIL_HOST = config('EMAIL_HOST', default='')
+if EMAIL_HOST:
+    EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+    EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+    EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+    EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@claygolftournament.org')
+# Notification email for raffle donations and other admin alerts.
+# Falls back to TournamentInfo.contact_email if not set.
+ADMIN_EMAIL = config('ADMIN_EMAIL', default='')
+
 # Square payment settings
 SQUARE_ACCESS_TOKEN = config('SQUARE_ACCESS_TOKEN', default='')
 SQUARE_LOCATION_ID = config('SQUARE_LOCATION_ID', default='')

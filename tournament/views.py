@@ -5,10 +5,11 @@ import requests
 
 from django.conf import settings
 from django.contrib import messages
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .models import TournamentInfo, Sponsor, SponsorshipPackage, Registration, RegistrationPlayer, AddOn, RegistrationAddOn
-from .forms import RegistrationForm
+from .models import TournamentInfo, Sponsor, SponsorshipPackage, Registration, RegistrationPlayer, AddOn, RegistrationAddOn, RaffleDonation
+from .forms import RegistrationForm, RaffleDonationForm
 
 logger = logging.getLogger(__name__)
 
@@ -93,10 +94,10 @@ def index(request):
 
     packages = SponsorshipPackage.objects.filter(is_active=True)
 
-    # Registrations with uploaded logos grouped by sponsor tier (exclude failed payments)
+    # Registrations with approved logos grouped by sponsor tier
     registrant_logos_qs = (
         Registration.objects
-        .exclude(payment_status='failed')
+        .filter(logo_approved=True)
         .filter(company_logo__isnull=False)
         .exclude(company_logo='')
         .select_related('sponsorship_package')
@@ -189,6 +190,7 @@ def register(request):
                     registration.save()
                     _save_players(registration, request.POST)
                     _save_addons(registration, request.POST)
+                    _send_registration_notification_email(registration, tournament)
                     return redirect('tournament:confirmation', pk=registration.pk)
                 else:
                     messages.error(
@@ -215,6 +217,7 @@ def register(request):
                 registration.save()
                 _save_players(registration, request.POST)
                 _save_addons(registration, request.POST)
+                _send_registration_notification_email(registration, tournament)
                 return redirect('tournament:confirmation', pk=registration.pk)
         # Form invalid — fall through to re-render below
     else:
@@ -250,3 +253,130 @@ def confirmation(request, pk):
         'has_addons': reg_addons.exists(),
     }
     return render(request, 'tournament/confirmation.html', context)
+
+
+def raffle_donate(request):
+    """Raffle item donation form."""
+    tournament = TournamentInfo.get_instance()
+
+    if request.method == 'POST':
+        form = RaffleDonationForm(request.POST)
+        if form.is_valid():
+            donation = form.save()
+            _send_raffle_donation_email(donation, tournament)
+            return redirect('tournament:raffle_donate_thanks')
+    else:
+        form = RaffleDonationForm()
+
+    return render(request, 'tournament/raffle_donate.html', {'form': form, 'tournament': tournament})
+
+
+def raffle_donate_thanks(request):
+    """Thank-you page after a raffle donation is submitted."""
+    tournament = TournamentInfo.get_instance()
+    return render(request, 'tournament/raffle_donate_thanks.html', {'tournament': tournament})
+
+
+def _send_registration_notification_email(registration, tournament):
+    """Notify the admin when a new tournament registration is submitted."""
+    admin_email = getattr(settings, 'ADMIN_EMAIL', None) or tournament.contact_email
+    if not admin_email:
+        logger.warning("No admin email configured — registration notification not sent.")
+        return
+
+    addons = list(registration.addons.select_related('addon').all())
+    addon_total = sum(ra.addon.price for ra in addons)
+    order_total = registration.sponsorship_package.price + addon_total
+
+    subject = (
+        f"New Registration: {registration.full_name} — {registration.sponsorship_package.name}"
+    )
+
+    lines = [
+        f"A new registration has been received for the {tournament.tournament_name}.",
+        "",
+        f"Name:     {registration.full_name}",
+        f"Email:    {registration.email}",
+    ]
+    if registration.phone:
+        lines.append(f"Phone:    {registration.phone}")
+    if registration.company_org:
+        lines.append(f"Company:  {registration.company_org}")
+    lines += [
+        "",
+        f"Package:  {registration.sponsorship_package.name} (${registration.sponsorship_package.price:,.2f})",
+    ]
+    if addons:
+        addon_names = ", ".join(ra.addon.name for ra in addons)
+        lines.append(f"Add-Ons:  {addon_names} (${addon_total:,.2f})")
+    lines.append(f"Total:    ${order_total:,.2f}")
+    lines += [
+        "",
+        f"Payment:  {registration.get_payment_method_display()}",
+        f"Status:   {registration.get_payment_status_display()}",
+    ]
+
+    players = list(registration.players.all())
+    if players:
+        lines += ["", "Players:"]
+        for p in players:
+            lines.append(f"  {p.slot}. {p.name or '(TBD)'}")
+
+    if registration.company_logo:
+        lines += [
+            "",
+            "Logo uploaded — review and approve in the admin before it appears on the site.",
+        ]
+    if registration.notes:
+        lines += ["", f"Notes: {registration.notes}"]
+
+    try:
+        send_mail(
+            subject=subject,
+            message="\n".join(lines),
+            from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', admin_email),
+            recipient_list=[admin_email],
+            fail_silently=False,
+        )
+    except Exception:
+        logger.exception("Failed to send registration notification email.")
+
+
+def _send_raffle_donation_email(donation, tournament):
+    """Send an admin notification email when a raffle donation is submitted."""
+    admin_email = getattr(settings, 'ADMIN_EMAIL', None) or tournament.contact_email
+    if not admin_email:
+        logger.warning("No admin email configured — raffle donation notification not sent.")
+        return
+
+    subject = f"New Raffle Donation: {donation.full_name}"
+    body_lines = [
+        f"A new raffle item donation has been submitted for the {tournament.tournament_name}.",
+        "",
+        f"Name:    {donation.full_name}",
+        f"Email:   {donation.email}",
+    ]
+    if donation.phone:
+        body_lines.append(f"Phone:   {donation.phone}")
+    if donation.company_name:
+        body_lines.append(f"Company: {donation.company_name}")
+    body_lines += [
+        "",
+        "Donation Description:",
+        donation.donation_description,
+        "",
+    ]
+    if donation.estimated_value:
+        body_lines.append(f"Estimated Value: ${donation.estimated_value:,.2f}")
+    body_lines.append(f"Delivery Method: {donation.get_delivery_method_display()}")
+
+    try:
+        send_mail(
+            subject=subject,
+            message="\n".join(body_lines),
+            from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', admin_email),
+            recipient_list=[admin_email],
+            fail_silently=False,
+        )
+    except Exception:
+        logger.exception("Failed to send raffle donation notification email.")

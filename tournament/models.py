@@ -136,6 +136,10 @@ class Registration(models.Model):
         null=True,
         help_text="Optional company logo (displayed on the tournament website)"
     )
+    logo_approved = models.BooleanField(
+        default=False,
+        help_text="Approve this logo to display it on the tournament home page."
+    )
     notes = models.TextField(blank=True, help_text="Any additional notes or special requests")
 
     class Meta:
@@ -143,6 +147,49 @@ class Registration(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} - {self.sponsorship_package.name}"
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+
+class RaffleDonation(models.Model):
+    """A raffle item donation pledge submitted via the homepage callout form."""
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True)
+    company_name = models.CharField(max_length=200, blank=True, verbose_name="Company / Organization")
+    donation_description = models.TextField(
+        verbose_name="Donation Description",
+        help_text="Describe the item(s) you would like to donate for the raffle."
+    )
+    estimated_value = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Estimated Value ($)",
+        help_text="Approximate retail value of the donated item(s)."
+    )
+    DELIVERY_CHOICES = [
+        ('drop_off', 'I will drop it off at Clay Elementary School'),
+        ('pick_up', 'Please have the tournament chair pick it up'),
+    ]
+    delivery_method = models.CharField(
+        max_length=20,
+        choices=DELIVERY_CHOICES,
+        verbose_name="Delivery Method",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Raffle Donation"
+        verbose_name_plural = "Raffle Donations"
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} — {self.donation_description[:60]}"
 
     @property
     def full_name(self):

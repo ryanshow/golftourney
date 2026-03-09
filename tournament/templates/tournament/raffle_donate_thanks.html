@@ -1,0 +1,54 @@
+{% extends 'tournament/base.html' %}
+
+{% block title %}Thank You - Raffle Donation - Clay Elementary School Golf Tournament{% endblock %}
+
+{% block content %}
+
+<!-- Thank You Header -->
+<div class="page-header py-5">
+    <div class="container text-center">
+        <div class="confirmation-icon mb-3">
+            <i class="bi bi-gift-fill text-gold" style="font-size: 4rem;"></i>
+        </div>
+        <h1 class="fw-bold text-white mb-2">Thank You!</h1>
+        <p class="text-white-75 fs-5 mb-0">Your raffle donation offer has been received.</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+
+            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="card-body p-5">
+                    <p class="fs-5 text-muted mb-4 lh-lg">
+                        We've notified our tournament team and someone will be in touch to coordinate
+                        your donation. Your generosity helps make this event a wonderful success for
+                        the students of Clay Elementary School.
+                    </p>
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a href="{% url 'tournament:index' %}" class="btn btn-outline-forest px-4">
+                            <i class="bi bi-house me-2"></i>Back to Home
+                        </a>
+                        <a href="{% url 'tournament:register' %}" class="btn btn-gold px-4">
+                            <i class="bi bi-pencil-square me-2"></i>Register as a Sponsor
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {% if tournament.contact_email %}
+            <p class="text-muted small">
+                Questions? Contact
+                {% if tournament.contact_name %}<strong>{{ tournament.contact_name }}</strong> at {% endif %}
+                <a href="mailto:{{ tournament.contact_email }}" class="text-forest-green fw-semibold">
+                    {{ tournament.contact_email }}
+                </a>
+            </p>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
