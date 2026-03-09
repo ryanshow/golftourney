@@ -1,0 +1,18 @@
+[project]
+name = "golftourney"
+version = "0.1.0"
+description = "Golf tournament website benefiting Clay Elementary School, Kingsburg CA"
+requires-python = ">=3.10"
+dependencies = [
+    "django>=4.2,<5.0",
+    "python-decouple",
+    "requests",
+    "Pillow",
+    "django-crispy-forms",
+    "crispy-bootstrap5",
+    "whitenoise",
+    "openpyxl>=3.1.5",
+    "gunicorn>=25.1.0",
+    "dj-database-url>=3.1.2",
+    "psycopg2-binary>=2.9.11",
+]

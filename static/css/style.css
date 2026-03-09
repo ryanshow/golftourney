@@ -1,0 +1,432 @@
+/* ============================================================
+   Clay Elementary School Golf Tournament – Custom Styles
+   Color Palette:
+     Navy  : #1d4582  (primary)
+     Red   : #ce171f  (accent)
+     White : #ffffff
+   ============================================================ */
+
+/* ── CSS Custom Properties ─────────────────────────────────── */
+:root {
+    --color-forest-green: #1d4582;
+    --color-forest-green-dark: #14305e;
+    --color-forest-green-light: #2558a8;
+    --color-gold: #ce171f;
+    --color-gold-dark: #a5131a;
+    --color-gold-light: #e83038;
+    --font-heading: 'Merriweather', Georgia, serif;
+    --font-body: 'Open Sans', sans-serif;
+}
+
+/* ── Base ─────────────────────────────────────────────────── */
+body {
+    font-family: var(--font-body);
+    color: #2c2c2c;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+}
+
+/* ── Utility Color Classes ────────────────────────────────── */
+.bg-forest-green  { background-color: var(--color-forest-green) !important; }
+.text-forest-green { color: var(--color-forest-green) !important; }
+.bg-gold          { background-color: var(--color-gold) !important; }
+.text-gold        { color: var(--color-gold) !important; }
+.text-white-75    { color: rgba(255, 255, 255, 0.75) !important; }
+.text-white-50    { color: rgba(255, 255, 255, 0.5) !important; }
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn-gold {
+    background-color: var(--color-gold);
+    border-color: var(--color-gold);
+    color: #fff;
+    font-weight: 600;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+}
+.btn-gold:hover {
+    background-color: var(--color-gold-dark);
+    border-color: var(--color-gold-dark);
+    color: #fff;
+    transform: translateY(-1px);
+}
+.btn-gold:active {
+    transform: translateY(0);
+}
+.btn-gold:focus {
+    box-shadow: 0 0 0 0.25rem rgba(206, 23, 31, 0.35);
+}
+
+.btn-outline-forest {
+    border-color: var(--color-forest-green);
+    color: var(--color-forest-green);
+    font-weight: 600;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.btn-outline-forest:hover {
+    background-color: var(--color-forest-green);
+    color: #fff;
+}
+
+/* ── Navbar ───────────────────────────────────────────────── */
+.navbar {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.navbar-brand {
+    font-family: var(--font-heading);
+}
+.navbar-logo-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+.navbar-nav .nav-link {
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    transition: color 0.2s ease;
+}
+.navbar-nav .nav-link:hover {
+    color: var(--color-gold) !important;
+}
+.hover-gold:hover {
+    color: var(--color-gold) !important;
+}
+
+/* ── Hero Section ─────────────────────────────────────────── */
+.hero-section {
+    position: relative;
+    min-height: 90vh;
+    background-image:
+        linear-gradient(135deg, rgba(29, 69, 130, 0.93) 0%, rgba(11, 29, 53, 0.90) 50%, rgba(29, 69, 130, 0.80) 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect width='400' height='400' fill='%231d4582'/%3E%3Ccircle cx='100' cy='350' r='80' fill='%232558a8' opacity='0.4'/%3E%3Ccircle cx='300' cy='100' r='120' fill='%2314305e' opacity='0.5'/%3E%3Ccircle cx='200' cy='200' r='60' fill='%23ce171f' opacity='0.08'/%3E%3C/svg%3E");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+}
+.hero-overlay {
+    width: 100%;
+    padding: 5rem 0;
+}
+.hero-title {
+    font-family: var(--font-heading);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    letter-spacing: -0.01em;
+}
+.hero-subtitle {
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Section Labels & Headings ────────────────────────────── */
+.section-badge {
+    display: inline-block;
+    background-color: var(--color-gold);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.85rem;
+    border-radius: 50px;
+}
+.section-heading {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    color: var(--color-forest-green);
+}
+
+/* ── Info Cards (tournament details) ──────────────────────── */
+.info-card {
+    background: #f8f9fa;
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-left: 3px solid var(--color-gold);
+}
+.info-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+/* ── School Card ──────────────────────────────────────────── */
+.school-card {
+    background: linear-gradient(135deg, #f0f4fa 0%, #dce6f5 100%);
+    border: 2px solid rgba(29, 69, 130, 0.12);
+    border-radius: 1.25rem;
+    box-shadow: 0 4px 20px rgba(29, 69, 130, 0.08);
+}
+.school-icon {
+    font-size: 4rem;
+    color: var(--color-forest-green);
+    line-height: 1;
+}
+
+/* ── Package Cards ────────────────────────────────────────── */
+.package-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 1rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+}
+.package-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+.package-featured {
+    border-color: var(--color-gold);
+    box-shadow: 0 0 0 2px var(--color-gold), 0 8px 24px rgba(206, 23, 31, 0.2);
+}
+.package-highlight {
+    border-color: var(--color-forest-green);
+    box-shadow: 0 0 0 2px var(--color-forest-green), 0 8px 24px rgba(29, 69, 130, 0.15);
+}
+
+.package-badge {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    background-color: var(--color-gold);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 0.3rem 0.75rem;
+    border-radius: 0 1rem 0 0.75rem;
+}
+.package-badge-silver {
+    background-color: var(--color-forest-green);
+    color: #fff;
+}
+
+.package-header {
+    background: linear-gradient(135deg, var(--color-forest-green), var(--color-forest-green-dark));
+    color: #fff;
+    padding: 1.5rem;
+    text-align: center;
+}
+.package-name {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+    color: rgba(255,255,255,0.9);
+}
+.package-price {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-gold);
+    line-height: 1;
+}
+.package-players {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    color: rgba(255,255,255,0.75);
+}
+
+.package-body {
+    padding: 1.25rem 1.5rem;
+    flex: 1;
+}
+.package-description {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+.package-benefits {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.package-benefits li {
+    font-size: 0.875rem;
+    padding: 0.25rem 0;
+    color: #3d3d3d;
+    display: flex;
+    align-items: flex-start;
+}
+.package-benefits li i {
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.package-footer {
+    padding: 1rem 1.5rem 1.5rem;
+}
+
+/* ── Sponsor Sections ─────────────────────────────────────── */
+.sponsor-tier-label {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    display: inline-block;
+    margin: 0 auto;
+}
+.sponsor-tier-section {
+    text-align: center;
+}
+
+.gold-tier   { background: rgba(206, 23, 31, 0.10); color: #8a0e13; border: 1px solid rgba(206, 23, 31, 0.35); }
+.silver-tier { background: rgba(150, 150, 160, 0.1);  color: #555;    border: 1px solid rgba(150,150,160,0.3); }
+.bronze-tier { background: rgba(180, 120, 60, 0.1);   color: #7a4a1e; border: 1px solid rgba(180,120,60,0.3); }
+.other-tier  { background: rgba(29, 69, 130, 0.08);    color: var(--color-forest-green); border: 1px solid rgba(17,40,75,0.2); }
+
+.sponsor-card {
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.sponsor-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+.sponsor-gold   { background: #fff; border: 2px solid rgba(206,23,31,0.3); min-height: 120px; }
+.sponsor-silver { background: #fff; border: 1px solid rgba(150,150,160,0.3); min-height: 100px; }
+.sponsor-bronze { background: #fff; border: 1px solid rgba(180,120,60,0.25); }
+.sponsor-other  { background: #fafafa; border: 1px solid #e5e5e5; }
+
+.sponsor-logo {
+    max-width: 100%;
+    max-height: 80px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+.sponsor-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+}
+.sponsor-name-placeholder {
+    font-weight: 700;
+    color: var(--color-forest-green);
+    text-align: center;
+    line-height: 1.3;
+}
+
+/* ── CTA Section ──────────────────────────────────────────── */
+.cta-section {
+    background: linear-gradient(135deg, var(--color-forest-green) 0%, var(--color-forest-green-dark) 100%);
+}
+
+/* ── Page Header (inner pages) ────────────────────────────── */
+.page-header {
+    background: linear-gradient(135deg, var(--color-forest-green) 0%, var(--color-forest-green-dark) 100%);
+    border-bottom: 3px solid var(--color-gold);
+}
+
+/* ── Registration Form ────────────────────────────────────── */
+.section-title {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    color: var(--color-forest-green);
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(29, 69, 130, 0.1);
+}
+
+/* Crispy form label styling */
+label {
+    font-weight: 600;
+    color: #3d3d3d;
+}
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--color-forest-green);
+    box-shadow: 0 0 0 0.2rem rgba(29, 69, 130, 0.2);
+}
+
+/* Package select highlight */
+.package-select select {
+    border-color: var(--color-gold);
+}
+
+/* Package details box (shown via JS) */
+.package-details-box {
+    background: linear-gradient(135deg, #f0f4fa, #dce6f5);
+    border-left: 4px solid var(--color-gold);
+    border-radius: 0 0.5rem 0.5rem 0;
+    padding: 1rem 1.25rem;
+    margin-top: 0.5rem;
+}
+
+/* ── Square Card Element ──────────────────────────────────── */
+.square-card-element {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    padding: 12px;
+    background: #fff;
+    min-height: 52px;
+    transition: border-color 0.2s ease;
+}
+.square-card-element:focus-within {
+    border-color: var(--color-forest-green);
+    box-shadow: 0 0 0 0.2rem rgba(29, 69, 130, 0.2);
+}
+
+/* ── Confirmation Page ────────────────────────────────────── */
+.step-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+/* ── Responsive Adjustments ───────────────────────────────── */
+@media (max-width: 767.98px) {
+    .hero-section {
+        min-height: 70vh;
+    }
+    .hero-title {
+        font-size: 2rem;
+    }
+    .section-heading {
+        font-size: 1.65rem;
+    }
+    .package-price {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .hero-title {
+        font-size: 1.65rem;
+    }
+}
+
+/* ── Accessibility ────────────────────────────────────────── */
+:focus-visible {
+    outline: 3px solid var(--color-gold);
+    outline-offset: 2px;
+}
+
+/* ── Smooth scrolling ─────────────────────────────────────── */
+html {
+    scroll-behavior: smooth;
+}
+
+/* ── Admin link in navbar (hidden from public) ────────────── */
+.admin-link {
+    font-size: 0.8rem;
+    opacity: 0.6;
+}

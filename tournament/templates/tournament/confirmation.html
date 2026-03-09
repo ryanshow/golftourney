@@ -1,0 +1,271 @@
+{% extends 'tournament/base.html' %}
+
+{% block title %}Registration Confirmed - Clay Elementary School Golf Tournament{% endblock %}
+
+{% block content %}
+
+<!-- Confirmation Hero -->
+<div class="page-header py-5">
+    <div class="container text-center">
+        {% if registration.payment_status == 'paid' %}
+        <div class="confirmation-icon mb-3">
+            <i class="bi bi-check-circle-fill text-gold" style="font-size: 4rem;"></i>
+        </div>
+        <h1 class="fw-bold text-white mb-2">You're Registered!</h1>
+        <p class="text-white-75 fs-5 mb-0">Thank you for supporting Clay Elementary School.</p>
+        {% else %}
+        <div class="confirmation-icon mb-3">
+            <i class="bi bi-envelope-check-fill text-gold" style="font-size: 4rem;"></i>
+        </div>
+        <h1 class="fw-bold text-white mb-2">Registration Received!</h1>
+        <p class="text-white-75 fs-5 mb-0">We'll confirm your spot once payment is received.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+
+            <!-- Registration Summary Card -->
+            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="card-header bg-forest-green text-white py-3 px-4 rounded-top-3">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-receipt me-2 text-gold"></i>Registration Summary
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row gy-3">
+                        <div class="col-sm-6">
+                            <div class="small text-muted fw-semibold text-uppercase mb-1">Registrant</div>
+                            <div class="fw-bold fs-5">{{ registration.full_name }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="small text-muted fw-semibold text-uppercase mb-1">Email</div>
+                            <div class="fw-semibold">{{ registration.email }}</div>
+                        </div>
+                        {% if registration.company_org %}
+                        <div class="col-sm-6">
+                            <div class="small text-muted fw-semibold text-uppercase mb-1">Company / Organization</div>
+                            <div class="fw-semibold">{{ registration.company_org }}</div>
+                        </div>
+                        {% endif %}
+                        {% if registration.phone %}
+                        <div class="col-sm-6">
+                            <div class="small text-muted fw-semibold text-uppercase mb-1">Phone</div>
+                            <div class="fw-semibold">{{ registration.phone }}</div>
+                        </div>
+                        {% endif %}
+                        <div class="col-12">
+                            <hr class="my-2">
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="small text-muted fw-semibold text-uppercase mb-1">Sponsorship Package</div>
+                            <div class="fw-bold text-forest-green fs-5">{{ registration.sponsorship_package.name }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="small text-muted fw-semibold text-uppercase mb-1">Amount</div>
+                            <div class="fw-bold text-forest-green fs-5">${{ registration.sponsorship_package.price|floatformat:2 }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="small text-muted fw-semibold text-uppercase mb-1">Payment Method</div>
+                            <div class="fw-semibold">{{ registration.get_payment_method_display }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="small text-muted fw-semibold text-uppercase mb-1">Payment Status</div>
+                            {% if registration.payment_status == 'paid' %}
+                            <span class="badge bg-success fs-6 px-3 py-2">
+                                <i class="bi bi-check-circle me-1"></i>Paid
+                            </span>
+                            {% elif registration.payment_status == 'pending' %}
+                            <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                                <i class="bi bi-clock me-1"></i>Pending Payment
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary fs-6 px-3 py-2">
+                                {{ registration.get_payment_status_display }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% if registration.square_payment_id %}
+                        <div class="col-12">
+                            <div class="small text-muted fw-semibold text-uppercase mb-1">Payment Reference</div>
+                            <code class="text-muted small">{{ registration.square_payment_id }}</code>
+                        </div>
+                        {% endif %}
+                        {% with reg_addons=registration.addons.all %}
+                        {% if reg_addons %}
+                        <div class="col-12">
+                            <hr class="my-2">
+                        </div>
+                        <div class="col-12">
+                            <div class="small text-muted fw-semibold text-uppercase mb-1">Add-On Packages</div>
+                            <ul class="list-unstyled mb-0">
+                                {% for ra in reg_addons %}
+                                <li class="fw-semibold"><i class="bi bi-plus-circle-fill text-gold me-1"></i>{{ ra.addon.name }} &mdash; ${{ ra.addon.price|floatformat:2 }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                        {% if has_addons %}
+                        <div class="col-12">
+                            <div class="small text-muted fw-semibold text-uppercase mb-1">Order Total</div>
+                            <div class="fw-bold text-forest-green fs-5">${{ total_amount|floatformat:2 }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tax Deductibility Notice -->
+            <div class="alert alert-light border small text-muted mb-4 d-flex align-items-start gap-2">
+                <i class="bi bi-patch-check-fill text-forest-green flex-shrink-0 mt-1"></i>
+                <span>
+                    Clay Elementary Parent Club is a <strong>501(c)(3) nonprofit organization</strong> (EIN: 46-2668474).
+                    Your sponsorship payment is tax deductible as provided by law. Please retain this confirmation for your records.
+                </span>
+            </div>
+
+            <!-- Player Names -->
+            {% with players=registration.players.all %}
+            {% if players %}
+            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="card-header bg-light py-3 px-4 rounded-top-3">
+                    <h5 class="mb-0 fw-bold text-forest-green">
+                        <i class="bi bi-people-fill me-2 text-gold"></i>Players in Your Group
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted small mb-3">
+                        {% if registration.sponsorship_package.max_players > players|length %}
+                        If any names are missing, our Tournament Chair will follow up with you.
+                        {% else %}
+                        Our Tournament Chair will be in touch with tournament day details for each player.
+                        {% endif %}
+                    </p>
+                    <ol class="mb-0 ps-3">
+                        {% for player in players %}
+                        <li class="py-1">
+                            {% if player.name %}
+                            <span class="fw-semibold">{{ player.name }}</span>
+                            {% else %}
+                            <span class="text-muted fst-italic">TBD &mdash; staff will follow up</span>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <!-- What's Next -->
+            {% if registration.payment_status == 'paid' %}
+            <div class="card border-0 bg-light mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-forest-green mb-3">
+                        <i class="bi bi-list-check me-2"></i>What Happens Next
+                    </h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="d-flex align-items-start gap-3 mb-3">
+                            <div class="step-icon bg-forest-green text-white flex-shrink-0">1</div>
+                            <div>
+                                <div class="fw-semibold">Confirmation Email</div>
+                                <div class="text-muted small">A confirmation email will be sent to <strong>{{ registration.email }}</strong> with your registration details.</div>
+                            </div>
+                        </li>
+                        <li class="d-flex align-items-start gap-3 mb-3">
+                            <div class="step-icon bg-forest-green text-white flex-shrink-0">2</div>
+                            <div>
+                                <div class="fw-semibold">Sponsorship Materials</div>
+                                <div class="text-muted small">
+                                    Our team will be in touch to collect your logo and any other materials
+                                    needed for your {{ registration.sponsorship_package.name }} package.
+                                </div>
+                            </div>
+                        </li>
+                        {% if registration.sponsorship_package.max_players > 0 %}
+                        <li class="d-flex align-items-start gap-3 mb-3">
+                            <div class="step-icon bg-gold text-dark flex-shrink-0">3</div>
+                            <div>
+                                <div class="fw-semibold">Player Information</div>
+                                <div class="text-muted small">
+                                    Your package includes
+                                    {{ registration.sponsorship_package.max_players }} player
+                                    {{ registration.sponsorship_package.max_players|pluralize:"entry,entries" }}.
+                                    We'll follow up for any missing player names before tournament day.
+                                </div>
+                            </div>
+                        </li>
+                        {% endif %}
+                        <li class="d-flex align-items-start gap-3">
+                            <div class="step-icon bg-gold text-dark flex-shrink-0">
+                                {% if registration.sponsorship_package.max_players > 0 %}4{% else %}3{% endif %}
+                            </div>
+                            <div>
+                                <div class="fw-semibold">Tournament Day</div>
+                                <div class="text-muted small">
+                                    {% if tournament.date %}
+                                    Join us on <strong>{{ tournament.date|date:"F j, Y" }}</strong>
+                                    {% if tournament.location %} at {{ tournament.location }}{% endif %}
+                                    for a great day of golf!
+                                    {% else %}
+                                    Watch for your tournament day details by email.
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            {% elif registration.payment_status == 'pending' and registration.payment_method == 'check' %}
+            <div class="card border-warning mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-warning mb-3">
+                        <i class="bi bi-envelope me-2"></i>Check Payment Instructions
+                    </h5>
+                    <p class="text-muted mb-2">Please make your check payable to:</p>
+                    <p class="fw-bold fs-5 text-dark mb-3">Clay Elementary Parent Club</p>
+                    <p class="text-muted small mb-2">
+                        <strong>Include in the memo:</strong> Golf Tournament &mdash; {{ registration.full_name }}
+                    </p>
+                    <p class="text-muted small mb-2">
+                        <strong><i class="bi bi-geo-alt me-1"></i>Mail to:</strong><br>
+                        Clay Elementary Parent Club<br>
+                        12449 S. Smith Ave.<br>
+                        Kingsburg, CA 93631
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Contact & Social Share -->
+            <div class="text-center mt-4">
+                <p class="text-muted mb-3">
+                    Questions? Contact {% if tournament.contact_name %}<strong>{{ tournament.contact_name }}</strong>{% else %}us{% endif %}
+                    {% if tournament.contact_email %}at
+                    <a href="mailto:{{ tournament.contact_email }}" class="text-forest-green fw-semibold">
+                        {{ tournament.contact_email }}
+                    </a>
+                    {% endif %}
+                    {% if tournament.contact_phone %}
+                    or {{ tournament.contact_phone }}
+                    {% endif %}
+                </p>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="{% url 'tournament:index' %}" class="btn btn-outline-forest px-4">
+                        <i class="bi bi-house me-2"></i>Back to Home
+                    </a>
+                    <a href="{% url 'tournament:register' %}" class="btn btn-gold px-4">
+                        <i class="bi bi-plus-circle me-2"></i>Register Another Sponsor
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

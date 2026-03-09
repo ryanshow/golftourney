@@ -1,0 +1,371 @@
+{% extends 'tournament/base.html' %}
+{% load static %}
+
+{% block title %}Clay Elementary School Golf Tournament - Kingsburg, CA{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-overlay">
+        <div class="container hero-content text-center text-white">
+            <div class="mb-3">
+                <span class="badge bg-gold text-dark px-3 py-2 fs-6 fw-semibold">
+                    <i class="bi bi-star-fill me-1"></i> Charity Golf Tournament
+                </span>
+            </div>
+            <h1 class="hero-title display-3 fw-bold mb-3">
+                Clay Elementary School<br>
+                <span class="text-gold">Golf Tournament</span>
+            </h1>
+            <p class="hero-subtitle fs-5 mb-2 text-white-75">
+                Benefiting Clay Elementary School &mdash; Kingsburg, CA
+            </p>
+            {% if tournament.date %}
+            <p class="fs-4 fw-semibold mb-1 text-gold">
+                <i class="bi bi-calendar3 me-2"></i>{{ tournament.date|date:"F j, Y" }}
+            </p>
+            {% endif %}
+            {% if tournament.location %}
+            <p class="mb-4 text-white-75">
+                <i class="bi bi-geo-alt me-1"></i>{{ tournament.location }}
+            </p>
+            {% endif %}
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{% url 'tournament:register' %}" class="btn btn-gold btn-lg px-5 py-3 shadow">
+                    <i class="bi bi-pencil-square me-2"></i>Register & Sponsor
+                </a>
+                <a href="#sponsorships" class="btn btn-outline-light btn-lg px-4 py-3">
+                    View Packages <i class="bi bi-arrow-down ms-1"></i>
+                </a>
+            </div>
+            {% if tournament.entry_deadline %}
+            <p class="mt-4 small text-white-50">
+                Registration deadline: <strong class="text-white">{{ tournament.entry_deadline|date:"F j, Y" }}</strong>
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- About / Tournament Info Section -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row align-items-center gy-4">
+            <div class="col-lg-6">
+                <div class="section-badge mb-2">About the Tournament</div>
+                <h2 class="section-heading mb-3">Supporting Education,<br><span class="text-gold">One Swing at a Time</span></h2>
+                {% if tournament.description %}
+                <p class="text-muted fs-5 lh-lg">{{ tournament.description }}</p>
+                {% else %}
+                <p class="text-muted fs-5 lh-lg">
+                    Join us for a wonderful day on the course in support of Clay Elementary School (K&ndash;8)
+                    in Kingsburg, CA. All funds raised by this golf tournament go directly towards funding
+                    Parent Club initiatives.
+                </p>
+                {% endif %}
+                <div class="row mt-4 gy-3">
+                    {% if tournament.date %}
+                    <div class="col-sm-6">
+                        <div class="info-card d-flex align-items-center gap-3">
+                            <div class="info-icon bg-forest-green text-white">
+                                <i class="bi bi-calendar3"></i>
+                            </div>
+                            <div>
+                                <div class="small text-muted fw-semibold text-uppercase">Tournament Date</div>
+                                <div class="fw-bold">{{ tournament.date|date:"F j, Y" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if tournament.location %}
+                    <div class="col-sm-6">
+                        <div class="info-card d-flex align-items-center gap-3">
+                            <div class="info-icon bg-forest-green text-white">
+                                <i class="bi bi-geo-alt"></i>
+                            </div>
+                            <div>
+                                <div class="small text-muted fw-semibold text-uppercase">Location</div>
+                                <div class="fw-bold">{{ tournament.location }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if tournament.contact_email %}
+                    <div class="col-sm-6">
+                        <div class="info-card d-flex align-items-center gap-3">
+                            <div class="info-icon bg-gold text-dark">
+                                <i class="bi bi-envelope"></i>
+                            </div>
+                            <div>
+                                <div class="small text-muted fw-semibold text-uppercase">Contact</div>
+                                {% if tournament.contact_name %}<div class="fw-bold">{{ tournament.contact_name }}</div>{% endif %}
+                                <div class="fw-bold">
+                                    <a href="mailto:{{ tournament.contact_email }}" class="text-forest-green">
+                                        {{ tournament.contact_email }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if tournament.entry_deadline %}
+                    <div class="col-sm-6">
+                        <div class="info-card d-flex align-items-center gap-3">
+                            <div class="info-icon bg-gold text-dark">
+                                <i class="bi bi-clock"></i>
+                            </div>
+                            <div>
+                                <div class="small text-muted fw-semibold text-uppercase">Registration Deadline</div>
+                                <div class="fw-bold">{{ tournament.entry_deadline|date:"F j, Y" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="school-card text-center p-5">
+                    <div class="school-icon mb-3">
+                        <img src="{% static 'images/Clay_Logo_2020_vFINAL_01.png' %}" alt="Clay Elementary School Logo" style="max-height: 160px; max-width: 100%; object-fit: contain;">
+                    </div>
+                    <h3 class="fw-bold text-forest-green mb-2">Clay Elementary School</h3>
+                    <p class="text-muted mb-1">Kindergarten &ndash; 8th Grade</p>
+                    <p class="text-muted">Kingsburg, CA</p>
+                    <hr class="my-3">
+                    <p class="text-muted small mb-2">
+                        All funds raised by this golf tournament go directly towards funding Parent Club
+                        initiatives, including educational enrichment opportunities, classroom supplies,
+                        field trips, athletics, and a host of other needs of Clay School.
+                    </p>
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-patch-check-fill text-forest-green me-1"></i>
+                        Clay Elementary Parent Club is a <strong>501(c)(3) nonprofit organization</strong>.
+                        Sponsorship payments are tax deductible as provided by law.
+                        EIN: 46-2668474
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sponsors Section -->
+{% if all_sponsors or any_registrant_logos %}
+<section id="sponsors" class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <div class="section-badge mb-2">Thank You</div>
+            <h2 class="section-heading">Our Generous Sponsors</h2>
+            <p class="text-muted mt-2">We are grateful for the support of our community partners.</p>
+        </div>
+
+        {% if gold_sponsors or reg_logos_gold %}
+        <div class="sponsor-tier-section mb-5">
+            <div class="sponsor-tier-label gold-tier">
+                <i class="bi bi-trophy-fill me-2"></i>Gold Sponsors
+            </div>
+            <div class="row gy-4 justify-content-center mt-3">
+                {% for sponsor in gold_sponsors %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="sponsor-card sponsor-gold">
+                        {% if sponsor.website_url %}<a href="{{ sponsor.website_url }}" target="_blank" rel="noopener" class="sponsor-link">{% endif %}
+                        {% if sponsor.logo %}
+                        <img src="{{ sponsor.logo.url }}" alt="{{ sponsor.name }}" class="sponsor-logo">
+                        {% else %}
+                        <div class="sponsor-name-placeholder">{{ sponsor.name }}</div>
+                        {% endif %}
+                        {% if sponsor.website_url %}</a>{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% for reg in reg_logos_gold %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="sponsor-card sponsor-gold">
+                        <img src="{{ reg.company_logo.url }}"
+                             alt="{{ reg.company_org|default:reg.full_name }}"
+                             class="sponsor-logo">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if silver_sponsors or reg_logos_silver %}
+        <div class="sponsor-tier-section mb-5">
+            <div class="sponsor-tier-label silver-tier">
+                <i class="bi bi-award-fill me-2"></i>Silver Sponsors
+            </div>
+            <div class="row gy-3 justify-content-center mt-3">
+                {% for sponsor in silver_sponsors %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="sponsor-card sponsor-silver">
+                        {% if sponsor.website_url %}<a href="{{ sponsor.website_url }}" target="_blank" rel="noopener" class="sponsor-link">{% endif %}
+                        {% if sponsor.logo %}
+                        <img src="{{ sponsor.logo.url }}" alt="{{ sponsor.name }}" class="sponsor-logo">
+                        {% else %}
+                        <div class="sponsor-name-placeholder">{{ sponsor.name }}</div>
+                        {% endif %}
+                        {% if sponsor.website_url %}</a>{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% for reg in reg_logos_silver %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="sponsor-card sponsor-silver">
+                        <img src="{{ reg.company_logo.url }}"
+                             alt="{{ reg.company_org|default:reg.full_name }}"
+                             class="sponsor-logo">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if bronze_sponsors or reg_logos_bronze %}
+        <div class="sponsor-tier-section mb-5">
+            <div class="sponsor-tier-label bronze-tier">
+                <i class="bi bi-medal-fill me-2"></i>Bronze Sponsors
+            </div>
+            <div class="row gy-3 justify-content-center mt-3">
+                {% for sponsor in bronze_sponsors %}
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="sponsor-card sponsor-bronze">
+                        {% if sponsor.website_url %}<a href="{{ sponsor.website_url }}" target="_blank" rel="noopener" class="sponsor-link">{% endif %}
+                        {% if sponsor.logo %}
+                        <img src="{{ sponsor.logo.url }}" alt="{{ sponsor.name }}" class="sponsor-logo">
+                        {% else %}
+                        <div class="sponsor-name-placeholder small">{{ sponsor.name }}</div>
+                        {% endif %}
+                        {% if sponsor.website_url %}</a>{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% for reg in reg_logos_bronze %}
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="sponsor-card sponsor-bronze">
+                        <img src="{{ reg.company_logo.url }}"
+                             alt="{{ reg.company_org|default:reg.full_name }}"
+                             class="sponsor-logo">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if other_sponsors or reg_logos_other %}
+        <div class="sponsor-tier-section">
+            <div class="sponsor-tier-label other-tier">
+                <i class="bi bi-heart-fill me-2"></i>Community Supporters
+            </div>
+            <div class="row gy-3 justify-content-center mt-3">
+                {% for sponsor in other_sponsors %}
+                <div class="col-6 col-md-3 col-lg-2">
+                    <div class="sponsor-card sponsor-other">
+                        {% if sponsor.website_url %}<a href="{{ sponsor.website_url }}" target="_blank" rel="noopener" class="sponsor-link">{% endif %}
+                        {% if sponsor.logo %}
+                        <img src="{{ sponsor.logo.url }}" alt="{{ sponsor.name }}" class="sponsor-logo">
+                        {% else %}
+                        <div class="sponsor-name-placeholder small">{{ sponsor.name }}</div>
+                        {% endif %}
+                        {% if sponsor.website_url %}</a>{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% for reg in reg_logos_other %}
+                <div class="col-6 col-md-3 col-lg-2">
+                    <div class="sponsor-card sponsor-other">
+                        <img src="{{ reg.company_logo.url }}"
+                             alt="{{ reg.company_org|default:reg.full_name }}"
+                             class="sponsor-logo">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Sponsorship Packages Section -->
+<section id="sponsorships" class="py-5 bg-white">
+    <div class="container">
+        <div class="text-center mb-5">
+            <div class="section-badge mb-2">Sponsorship Opportunities</div>
+            <h2 class="section-heading">Choose Your Level of Support</h2>
+            <p class="text-muted fs-5 mt-2">Every sponsorship level makes a meaningful difference for our students.</p>
+        </div>
+
+        <div class="row gy-4 justify-content-center">
+            {% for package in packages %}
+            <div class="col-md-6 col-lg-4">
+                <div class="package-card h-100 {% if package.price >= 5000 %}package-featured{% elif package.price >= 2000 %}package-highlight{% endif %}">
+                    {% if package.price >= 5000 %}
+                    <div class="package-badge">
+                        <i class="bi bi-star-fill me-1"></i>Presenting Sponsor
+                    </div>
+                    {% elif package.price >= 2000 %}
+                    <div class="package-badge package-badge-silver">
+                        <i class="bi bi-people-fill me-1"></i>Team Package
+                    </div>
+                    {% endif %}
+                    <div class="package-header">
+                        <h3 class="package-name">{{ package.name }}</h3>
+                        <div class="package-price">${{ package.price|floatformat:0 }}</div>
+                        {% if package.max_players > 0 %}
+                        <div class="package-players">
+                            <i class="bi bi-person-fill me-1"></i>
+                            {{ package.max_players }} Player Entr{{ package.max_players|pluralize:"y,ies" }} Included
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="package-body">
+                        <p class="package-description">{{ package.description }}</p>
+                        <ul class="package-benefits">
+                            {% for benefit in package.benefits_list %}
+                            <li>
+                                <i class="bi bi-check-circle-fill text-gold me-2"></i>{{ benefit }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="package-footer">
+                        <a href="{% url 'tournament:register' %}?package={{ package.pk }}"
+                           class="btn {% if package.price >= 2000 %}btn-gold{% else %}btn-outline-forest{% endif %} w-100">
+                            Select This Package
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-5">
+            <p class="text-muted">
+                Questions about sponsorship opportunities?
+                {% if tournament.contact_email %}
+                Contact {% if tournament.contact_name %}<strong>{{ tournament.contact_name }}</strong> at {% endif %}<a href="mailto:{{ tournament.contact_email }}" class="text-forest-green fw-semibold">{{ tournament.contact_email }}</a>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section py-5">
+    <div class="container text-center">
+        <h2 class="display-5 fw-bold text-white mb-3">Ready to Make a Difference?</h2>
+        <p class="fs-5 text-white-75 mb-4">
+            Register today and help support the students of Clay Elementary School.
+        </p>
+        <a href="{% url 'tournament:register' %}" class="btn btn-gold btn-lg px-5 py-3 shadow-lg">
+            <i class="bi bi-pencil-square me-2"></i>Register & Sponsor Now
+        </a>
+    </div>
+</section>
+
+{% endblock %}

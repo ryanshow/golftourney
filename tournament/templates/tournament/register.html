@@ -1,0 +1,442 @@
+{% extends 'tournament/base.html' %}
+{% load crispy_forms_tags static %}
+
+{% block title %}Register - Clay Elementary School Golf Tournament{% endblock %}
+
+{% block extra_css %}
+<style>
+    .square-card-element {
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        padding: 12px;
+        background: #fff;
+        min-height: 52px;
+    }
+    .sq-card-wrapper {
+        min-height: 40px;
+    }
+    #payment-status-container .alert {
+        margin-top: 0.5rem;
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="section-badge mb-2">Join Us on the Course</div>
+                <h1 class="fw-bold text-white mb-1">Register & Sponsor</h1>
+                <p class="text-white-75 mb-0">Secure your spot and support Clay Elementary School.</p>
+            </div>
+            <div class="col-auto d-none d-md-block">
+                <i class="bi bi-flag-fill text-gold" style="font-size: 4rem; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body p-4 p-md-5">
+                    {% crispy form %}
+                </div>
+            </div>
+
+            <!-- Payment security note -->
+            <div class="text-center mt-4">
+                <p class="text-muted small">
+                    <i class="bi bi-shield-lock-fill text-forest-green me-1"></i>
+                    Credit card payments are processed securely by
+                    <a href="https://squareup.com" target="_blank" rel="noopener" class="text-forest-green">Square</a>.
+                    We never store your card details.
+                </p>
+                {% if form.fields.payment_method.choices %}
+                <p class="text-muted small">
+                    <i class="bi bi-envelope-fill me-1"></i>
+                    Check payments: make checks payable to <strong>Clay Elementary Parent Club</strong>.
+                    Details will be emailed after registration.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar: Package Summary -->
+        <div class="col-lg-4 col-xl-4 mt-4 mt-lg-0">
+            <div class="sticky-top" style="top: 80px;">
+                <div class="card border-0 bg-forest-green text-white shadow">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3 text-gold">
+                            <i class="bi bi-info-circle me-2"></i>Package Summary
+                        </h5>
+                        <div id="sidebar-package-info">
+                            <p class="text-white-50 small">Select a sponsorship package to see details here.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Check payment instructions -->
+                <div id="check-instructions" class="card border-warning mt-3 d-none">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-warning mb-2">
+                            <i class="bi bi-envelope me-2"></i>Check Payment Instructions
+                        </h6>
+                        <p class="small text-muted mb-2">Please make your check payable to:</p>
+                        <p class="fw-bold text-dark mb-2">Clay Elementary Parent Club</p>
+                        <p class="small text-muted mb-1">
+                            <strong>Mail to:</strong><br>
+                            Clay Elementary Parent Club<br>
+                            12449 S. Smith Ave.<br>
+                            Kingsburg, CA 93631
+                        </p>
+                        <p class="small text-muted mb-0">
+                            Registration is not confirmed until payment is received.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card border-0 bg-light mt-3">
+                    <div class="card-body p-4">
+                        <h6 class="fw-semibold text-forest-green mb-2">
+                            <i class="bi bi-question-circle me-2"></i>Questions?
+                        </h6>
+                        {% if tournament.contact_email %}
+                        <p class="small text-muted mb-1">
+                            {% if tournament.contact_name %}<strong>{{ tournament.contact_name }}</strong><br>{% endif %}
+                            <a href="mailto:{{ tournament.contact_email }}" class="text-forest-green">
+                                {{ tournament.contact_email }}
+                            </a>
+                        </p>
+                        {% endif %}
+                        {% if tournament.contact_phone %}
+                        <p class="small text-muted mb-0">{{ tournament.contact_phone }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card border-0 bg-light mt-3">
+                    <div class="card-body p-3">
+                        <p class="small text-muted mb-0">
+                            <i class="bi bi-patch-check-fill text-forest-green me-1"></i>
+                            Clay Elementary Parent Club is a <strong>501(c)(3) nonprofit organization</strong>.
+                            Sponsorship payments are tax deductible as provided by law.
+                            EIN: 46-2668474
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Square Web Payments SDK -->
+<script src="{{ square_js_url }}"></script>
+
+<script>
+// Package data from server
+const PACKAGE_DATA = {{ package_data|safe }};
+const ADDON_DATA = {{ addon_data|safe }};
+const SQUARE_APP_ID = "{{ square_app_id }}";
+const SQUARE_LOCATION_ID = "{{ square_location_id }}";
+
+let card = null;  // Square card instance
+let squarePayments = null;
+
+// ── DOM refs ─────────────────────────────────────────────────────────────────
+const packageSelect      = document.getElementById('id_sponsorship_package');
+const paymentSelect      = document.getElementById('id_payment_method');
+const squareContainer    = document.getElementById('square-card-container');
+const checkInstr         = document.getElementById('check-instructions');
+const sourceIdInput      = document.getElementById('square-source-id');
+const form               = document.getElementById('registration-form');
+const submitBtn          = document.getElementById('submit-btn');
+const submitText         = document.getElementById('submit-text');
+const submitSpinner      = document.getElementById('submit-spinner');
+const statusContainer    = document.getElementById('payment-status-container');
+const sidebarInfo        = document.getElementById('sidebar-package-info');
+const playerNamesSection = document.getElementById('player-names-section');
+const playerNamesFields  = document.getElementById('player-names-fields');
+const addonFields        = document.getElementById('addon-fields');
+const logoUploadSection  = document.getElementById('logo-upload-section');
+
+// ── Logo upload section ───────────────────────────────────────────────────────
+function updateLogoSection() {
+    const pkgId = packageSelect ? packageSelect.value : '';
+    const pkg = pkgId ? PACKAGE_DATA[pkgId] : null;
+    if (logoUploadSection) {
+        logoUploadSection.classList.toggle('d-none', !(pkg && pkg.logo_upload));
+    }
+}
+
+// ── Player name fields ────────────────────────────────────────────────────────
+function updatePlayerFields() {
+    const pkgId = packageSelect ? packageSelect.value : '';
+    const pkg = pkgId ? PACKAGE_DATA[pkgId] : null;
+    const maxPlayers = pkg ? pkg.max_players : 0;
+
+    if (maxPlayers > 0) {
+        // Preserve any names already entered
+        const existing = {};
+        playerNamesFields.querySelectorAll('input[type="text"]').forEach(inp => {
+            existing[inp.name] = inp.value;
+        });
+
+        let html = '';
+        for (let i = 1; i <= maxPlayers; i++) {
+            const val = existing[`player_name_${i}`] || '';
+            html += `
+                <div class="mb-3">
+                    <label for="player_name_${i}" class="form-label">
+                        Player ${i}
+                        <span class="text-muted fw-normal small">(optional)</span>
+                    </label>
+                    <input type="text" class="form-control" id="player_name_${i}"
+                           name="player_name_${i}" placeholder="Full name"
+                           maxlength="200" value="${val.replace(/"/g, '&quot;')}">
+                </div>`;
+        }
+        playerNamesFields.innerHTML = html;
+        playerNamesSection.classList.remove('d-none');
+    } else {
+        playerNamesFields.innerHTML = '';
+        playerNamesSection.classList.add('d-none');
+    }
+}
+
+// ── Add-on checkboxes ─────────────────────────────────────────────────────────
+function renderAddons() {
+    if (!addonFields) return;
+    const ids = Object.keys(ADDON_DATA);
+    if (ids.length === 0) {
+        addonFields.innerHTML = '<p class="text-muted small">No add-ons available.</p>';
+        return;
+    }
+    let html = '';
+    ids.forEach(id => {
+        const a = ADDON_DATA[id];
+        const price = parseFloat(a.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        html += `
+        <div class="form-check mb-2 py-3 pe-4 ps-5 border rounded">
+            <input class="form-check-input addon-check" type="checkbox" name="addon_ids" id="addon_${id}" value="${id}">
+            <label class="form-check-label" for="addon_${id}">
+                <span class="fw-semibold">${a.name}</span> &mdash; <span class="text-gold fw-bold">$${price}</span>
+                ${a.description ? `<br><small class="text-muted">${a.description}</small>` : ''}
+            </label>
+        </div>`;
+    });
+    addonFields.innerHTML = html;
+    addonFields.querySelectorAll('.addon-check').forEach(cb => {
+        cb.addEventListener('change', updatePackageSidebar);
+    });
+}
+
+// ── Package sidebar ───────────────────────────────────────────────────────────
+function updatePackageSidebar() {
+    const pkgId = packageSelect ? packageSelect.value : '';
+    if (!pkgId || !PACKAGE_DATA[pkgId]) {
+        sidebarInfo.innerHTML = '<p class="text-white-50 small">Select a sponsorship package to see details here.</p>';
+        return;
+    }
+    const pkg = PACKAGE_DATA[pkgId];
+    const pkgPrice = parseFloat(pkg.price);
+
+    // Collect selected add-ons
+    const selectedAddons = [];
+    if (addonFields) {
+        addonFields.querySelectorAll('.addon-check:checked').forEach(cb => {
+            const addonId = cb.value;
+            if (ADDON_DATA[addonId]) {
+                selectedAddons.push({id: addonId, ...ADDON_DATA[addonId]});
+            }
+        });
+    }
+    const addonTotal = selectedAddons.reduce((sum, a) => sum + parseFloat(a.price), 0);
+    const orderTotal = pkgPrice + addonTotal;
+
+    const fmt = n => n.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+    let html = `
+        <div class="mb-2">
+            <div class="h5 fw-bold mb-0">${pkg.name}</div>
+            <div class="display-6 fw-bold text-gold">$${fmt(pkgPrice)}</div>
+        </div>`;
+    if (pkg.max_players > 0) {
+        html += `<div class="badge bg-gold text-dark mb-2">
+            <i class="bi bi-person-fill me-1"></i>${pkg.max_players} Player ${pkg.max_players === 1 ? 'Entry' : 'Entries'} Included
+        </div>`;
+    }
+    html += `<p class="text-white-75 small mb-3">${pkg.description}</p>`;
+    if (pkg.benefits && pkg.benefits.length > 0) {
+        html += '<ul class="list-unstyled small mb-0">';
+        pkg.benefits.forEach(b => {
+            html += `<li class="mb-1"><i class="bi bi-check-circle-fill text-gold me-2"></i>${b}</li>`;
+        });
+        html += '</ul>';
+    }
+
+    if (selectedAddons.length > 0) {
+        html += '<hr class="border-white-50 my-3">';
+        html += `<div class="small text-white-75 mb-1 fw-semibold text-uppercase">Package</div>`;
+        html += `<div class="d-flex justify-content-between small mb-1"><span>${pkg.name}</span><span>$${fmt(pkgPrice)}</span></div>`;
+        selectedAddons.forEach(a => {
+            html += `<div class="d-flex justify-content-between small mb-1"><span>${a.name}</span><span>$${fmt(parseFloat(a.price))}</span></div>`;
+        });
+        html += '<hr class="border-white-50 my-2">';
+        html += `<div class="d-flex justify-content-between fw-bold"><span>Order Total</span><span class="text-gold">$${fmt(orderTotal)}</span></div>`;
+    }
+
+    sidebarInfo.innerHTML = html;
+}
+
+// ── Square initialization ─────────────────────────────────────────────────────
+async function initSquare() {
+    if (!window.Square) {
+        console.warn('Square SDK not loaded');
+        return;
+    }
+    if (!SQUARE_APP_ID || !SQUARE_LOCATION_ID) {
+        console.warn('Square credentials not configured');
+        showStatus('Payment processor not configured. Please contact us to register.', 'warning');
+        return;
+    }
+    try {
+        squarePayments = window.Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
+        card = await squarePayments.card({
+            style: {
+                '.input-container': { borderRadius: '4px' },
+                '.input-container.is-focus': { borderColor: '#1d4582' },
+                '.input-container.is-error': { borderColor: '#dc3545' },
+                '.message-text': { color: '#6c757d' },
+                '.message-icon': { color: '#6c757d' },
+            }
+        });
+        await card.attach('#card-container');
+    } catch (e) {
+        console.error('Square init error:', e);
+        showStatus('Could not initialize payment form. Please try refreshing the page.', 'danger');
+    }
+}
+
+async function tokenizeCard() {
+    if (!card) return null;
+    const result = await card.tokenize();
+    if (result.status === 'OK') {
+        return result.token;
+    }
+    let errMsg = 'Card error';
+    if (result.errors && result.errors.length > 0) {
+        errMsg = result.errors.map(e => e.message).join(' ');
+    }
+    throw new Error(errMsg);
+}
+
+function showStatus(message, type = 'danger') {
+    statusContainer.innerHTML = `
+        <div class="alert alert-${type} py-2 small mb-0">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>${message}
+        </div>`;
+}
+
+function clearStatus() {
+    statusContainer.innerHTML = '';
+}
+
+// ── Payment method toggle ─────────────────────────────────────────────────────
+function handlePaymentMethodChange() {
+    const method = paymentSelect ? paymentSelect.value : '';
+    if (method === 'square') {
+        squareContainer.classList.remove('d-none');
+        checkInstr.classList.add('d-none');
+        if (!card && window.Square) {
+            initSquare();
+        }
+    } else if (method === 'check') {
+        squareContainer.classList.add('d-none');
+        checkInstr.classList.remove('d-none');
+        clearStatus();
+    } else {
+        squareContainer.classList.add('d-none');
+        checkInstr.classList.add('d-none');
+    }
+}
+
+// ── Pre-select package from query string ──────────────────────────────────────
+function preselectPackage() {
+    const params = new URLSearchParams(window.location.search);
+    const pkgId = params.get('package');
+    if (pkgId && packageSelect) {
+        packageSelect.value = pkgId;
+        updatePackageSidebar();
+    }
+}
+
+// ── Form submission ────────────────────────────────────────────────────────────
+if (form) {
+    form.addEventListener('submit', async function(e) {
+        const method = paymentSelect ? paymentSelect.value : '';
+
+        if (method === 'square') {
+            e.preventDefault();
+            clearStatus();
+            submitBtn.disabled = true;
+            submitText.textContent = 'Processing Payment…';
+            submitSpinner.classList.remove('d-none');
+
+            try {
+                const token = await tokenizeCard();
+                if (!token) {
+                    throw new Error('Could not get payment token.');
+                }
+                sourceIdInput.value = token;
+                form.submit();
+            } catch (err) {
+                showStatus(err.message || 'Payment error. Please check your card and try again.');
+                submitBtn.disabled = false;
+                submitText.textContent = 'Complete Registration';
+                submitSpinner.classList.add('d-none');
+            }
+        }
+        // For 'check', just let the form submit normally
+    });
+}
+
+// ── Event listeners & init ────────────────────────────────────────────────────
+if (packageSelect) {
+    packageSelect.addEventListener('change', () => {
+        updatePackageSidebar();
+        updatePlayerFields();
+        updateLogoSection();
+    });
+}
+if (paymentSelect) {
+    paymentSelect.addEventListener('change', handlePaymentMethodChange);
+}
+
+// On page load
+renderAddons();
+preselectPackage();
+updatePackageSidebar();
+updatePlayerFields();
+updateLogoSection();
+handlePaymentMethodChange();
+</script>
+{% endblock %}

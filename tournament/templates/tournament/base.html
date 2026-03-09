@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Clay Elementary School Golf Tournament{% endblock %}</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-forest-green sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'tournament:index' %}">
+            <img src="{% static 'images/Clay_Logo_2020_vFINAL_01.png' %}" alt="Clay Elementary School" style="height: 40px; width: auto; object-fit: contain;">
+            <div>
+                <div class="fw-bold lh-1">Clay Elementary</div>
+                <div class="small text-gold lh-1">Golf Tournament</div>
+            </div>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center gap-1">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'tournament:index' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'tournament:index' %}#sponsorships">Sponsorships</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'tournament:index' %}#sponsors">Our Sponsors</a>
+                </li>
+                <li class="nav-item ms-2">
+                    <a class="btn btn-gold btn-sm px-3" href="{% url 'tournament:register' %}">Register Now</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Messages -->
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Main Content -->
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Footer -->
+<footer class="bg-forest-green text-white py-5 mt-5">
+    <div class="container">
+        <div class="row gy-4">
+            <div class="col-md-4">
+                <h5 class="text-gold fw-bold mb-3">
+                    <i class="bi bi-flag-fill me-2"></i>Clay Elementary Golf Tournament
+                </h5>
+                <p class="text-white-50 small mb-0">
+                    A charity golf tournament benefiting Clay Elementary School in Kingsburg, CA.
+                    All funds raised go directly towards funding Parent Club initiatives.
+                </p>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-gold fw-semibold mb-3">Quick Links</h6>
+                <ul class="list-unstyled small">
+                    <li class="mb-1"><a href="{% url 'tournament:index' %}" class="text-white-50 text-decoration-none hover-gold">Home</a></li>
+                    <li class="mb-1"><a href="{% url 'tournament:index' %}#sponsorships" class="text-white-50 text-decoration-none hover-gold">Sponsorship Packages</a></li>
+                    <li class="mb-1"><a href="{% url 'tournament:register' %}" class="text-white-50 text-decoration-none hover-gold">Register</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-gold fw-semibold mb-3">Contact Us</h6>
+                <ul class="list-unstyled small text-white-50">
+                    {% if tournament %}
+                    {% if tournament.contact_email %}
+                    <li class="mb-1">
+                        <i class="bi bi-envelope me-2"></i>
+                        {% if tournament.contact_name %}{{ tournament.contact_name }} &mdash; {% endif %}<a href="mailto:{{ tournament.contact_email }}" class="text-white-50 text-decoration-none">{{ tournament.contact_email }}</a>
+                    </li>
+                    {% endif %}
+                    {% if tournament.contact_phone %}
+                    <li class="mb-1">
+                        <i class="bi bi-telephone me-2"></i>
+                        {{ tournament.contact_phone }}
+                    </li>
+                    {% endif %}
+                    {% if tournament.location %}
+                    <li class="mb-1">
+                        <i class="bi bi-geo-alt me-2"></i>{{ tournament.location }}
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        <hr class="border-secondary my-4">
+        <div class="text-center text-white-50 small">
+            <p class="mb-1">
+                &copy; {% now "Y" %} Clay Elementary School Golf Tournament. All rights reserved.
+                Benefiting Clay Elementary School, Kingsburg, CA.
+            </p>
+            <p class="mb-0">
+                Clay Elementary Parent Club is a 501(c)(3) nonprofit organization (EIN: 46-2668474).
+                Sponsorship payments are tax deductible as provided by law.
+            </p>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>
