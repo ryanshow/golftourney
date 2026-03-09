@@ -4,5 +4,5 @@ builder = "nixpacks"
 [deploy]
 preDeployCommand = "python manage.py collectstatic --noinput && python manage.py migrate"
 startCommand = "gunicorn golftourney.wsgi --bind 0.0.0.0:$PORT --workers 2 --timeout 60"
-healthcheckPath = "/"
+healthcheckPath = ""
 restartPolicyType = "on_failure"
