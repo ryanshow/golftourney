@@ -11,7 +11,10 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-in-producti
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+# Always include localhost/127.0.0.1 so Railway's internal healthcheck requests are accepted
+# regardless of what domains are set in the ALLOWED_HOSTS env var.
+_allowed_hosts = [h.strip() for h in config('ALLOWED_HOSTS', default='').split(',') if h.strip()]
+ALLOWED_HOSTS = list({'127.0.0.1', 'localhost'} | set(_allowed_hosts))
 
 # Application definition
 INSTALLED_APPS = [
@@ -116,8 +119,11 @@ CSRF_TRUSTED_ORIGINS = [
 
 # Production security settings (applied when DEBUG=False)
 if not DEBUG:
+    # Trust Railway's reverse proxy so Django knows requests are HTTPS.
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
+    # Do NOT set SECURE_SSL_REDIRECT — Railway's healthcheck uses plain HTTP to
+    # the container's internal port. A 301 redirect fails the healthcheck.
+    # Railway enforces HTTPS at its edge proxy, so this redirect is unnecessary.
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 31536000
