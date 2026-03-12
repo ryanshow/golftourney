@@ -172,13 +172,6 @@
                         <li class="d-flex align-items-start gap-3 mb-3">
                             <div class="step-icon bg-forest-green text-white flex-shrink-0">1</div>
                             <div>
-                                <div class="fw-semibold">Confirmation Email</div>
-                                <div class="text-muted small">A confirmation email will be sent to <strong>{{ registration.email }}</strong> with your registration details.</div>
-                            </div>
-                        </li>
-                        <li class="d-flex align-items-start gap-3 mb-3">
-                            <div class="step-icon bg-forest-green text-white flex-shrink-0">2</div>
-                            <div>
                                 <div class="fw-semibold">Sponsorship Materials</div>
                                 <div class="text-muted small">
                                     Our team will be in touch to collect your logo and any other materials
@@ -188,7 +181,7 @@
                         </li>
                         {% if registration.sponsorship_package.max_players > 0 %}
                         <li class="d-flex align-items-start gap-3 mb-3">
-                            <div class="step-icon bg-gold text-dark flex-shrink-0">3</div>
+                            <div class="step-icon bg-gold text-dark flex-shrink-0">2</div>
                             <div>
                                 <div class="fw-semibold">Player Information</div>
                                 <div class="text-muted small">
@@ -202,7 +195,7 @@
                         {% endif %}
                         <li class="d-flex align-items-start gap-3">
                             <div class="step-icon bg-gold text-dark flex-shrink-0">
-                                {% if registration.sponsorship_package.max_players > 0 %}4{% else %}3{% endif %}
+                                {% if registration.sponsorship_package.max_players > 0 %}3{% else %}2{% endif %}
                             </div>
                             <div>
                                 <div class="fw-semibold">Tournament Day</div>
@@ -256,6 +249,10 @@
                     {% endif %}
                 </p>
                 <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="{% url 'tournament:invoice_pdf' token=registration.token %}"
+                       class="btn btn-outline-forest px-4">
+                        <i class="bi bi-file-earmark-arrow-down me-2"></i>Download Invoice
+                    </a>
                     <a href="{% url 'tournament:index' %}" class="btn btn-outline-forest px-4">
                         <i class="bi bi-house me-2"></i>Back to Home
                     </a>
