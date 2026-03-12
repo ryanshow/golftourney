@@ -191,7 +191,7 @@ def register(request):
                     _save_players(registration, request.POST)
                     _save_addons(registration, request.POST)
                     _send_registration_notification_email(registration, tournament)
-                    return redirect('tournament:confirmation', pk=registration.pk)
+                    return redirect('tournament:confirmation', token=registration.token)
                 else:
                     messages.error(
                         request,
@@ -218,7 +218,7 @@ def register(request):
                 _save_players(registration, request.POST)
                 _save_addons(registration, request.POST)
                 _send_registration_notification_email(registration, tournament)
-                return redirect('tournament:confirmation', pk=registration.pk)
+                return redirect('tournament:confirmation', token=registration.token)
         # Form invalid — fall through to re-render below
     else:
         form = RegistrationForm()
@@ -239,9 +239,9 @@ def register(request):
     return render(request, 'tournament/register.html', context)
 
 
-def confirmation(request, pk):
+def confirmation(request, token):
     """Confirmation page after registration."""
-    registration = get_object_or_404(Registration, pk=pk)
+    registration = get_object_or_404(Registration, token=token)
     tournament = TournamentInfo.get_instance()
     reg_addons = registration.addons.select_related('addon').all()
     addon_total = sum(ra.addon.price for ra in reg_addons)
